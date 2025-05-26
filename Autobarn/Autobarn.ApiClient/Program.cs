@@ -7,6 +7,9 @@ var http = new HttpClient() {
 var logger = LoggerFactory.Create(lb
 	=> lb.AddConsole()).CreateLogger<AutobarnApiClient>();
 var client = new AutobarnApiClient(http, logger);
-foreach (var model in await client.ListModelCodes()) {
-	Console.WriteLine(model.Code);
+Console.WriteLine("Press a key to create a random car:");
+while (true) {
+	var location = await client.CreateRandomVehicleAsync();
+	Console.WriteLine($"Created car at {location}");
+	Console.ReadKey();
 }
