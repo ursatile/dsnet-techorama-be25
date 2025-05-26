@@ -29,6 +29,8 @@ public class AutobarnPricingClientService(
 		};
 		var price = await pricer.GetPriceAsync(priceRequest);
 		logger.LogInformation("Got a price: {price} {currency}", price.Price, price.Currency);
+		var newVehiclePriceMessage = message.WithPrice(price.Price, price.Currency);
+		await bus.PubSub.PublishAsync(newVehiclePriceMessage);
 	}
 
 	public Task StopAsync(CancellationToken cancellationToken) {

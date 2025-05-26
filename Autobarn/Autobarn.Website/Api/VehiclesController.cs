@@ -48,7 +48,9 @@ public class VehiclesController(
 
 	[HttpPost]
 	public async Task<ActionResult<Vehicle>> PostVehicle(VehicleDto dto) {
-		var model = await db.Models.FirstOrDefaultAsync(m => m.Code == dto.ModelCode);
+		var model = await db.Models
+			.Include(m => m.Make)
+			.FirstOrDefaultAsync(m => m.Code == dto.ModelCode);
 		if (model == null) return BadRequest($"Sorry, we don't have a car called {dto.ModelCode}");
 
 		var vehicle = new Vehicle {
@@ -62,7 +64,6 @@ public class VehiclesController(
 		try {
 			await db.SaveChangesAsync();
 			await PublishNewVehicleMessage(vehicle);
-
 		}
 		catch (DbUpdateException) {
 			if (VehicleExists(vehicle.Registration!)) return Conflict();
