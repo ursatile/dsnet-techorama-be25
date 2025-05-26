@@ -14,6 +14,7 @@ public class NewVehicleMessage {
 	public NewVehiclePriceMessage WithPrice(int price, string currency) => new() {
 		Price = price,
 		Currency = currency,
+		Manufacturer = this.Manufacturer,
 		ModelName = this.ModelName,
 		ModelCode = this.ModelCode,
 		Color = this.Color,
