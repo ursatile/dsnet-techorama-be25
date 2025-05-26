@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AutobarnDbContext>(options => options.UseSqlite(sq
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
@@ -28,5 +29,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseOpenApi();
+app.UseSwaggerUi();
 
 app.Run();
