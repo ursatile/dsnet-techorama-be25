@@ -1,4 +1,5 @@
 using Autobarn.Messages;
+using Autobarn.Pricing;
 using EasyNetQ;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,8 @@ namespace Autobarn.PricingClient;
 
 public class AutobarnPricingClientService(
 	ILogger<AutobarnPricingClientService> logger,
-	IBus bus
+	IBus bus,
+	Pricer.PricerClient pricer
 ) : IHostedService {
 	private const string SUBSCRIBER_ID = "autobarn.pricingclient";
 
@@ -17,9 +19,16 @@ public class AutobarnPricingClientService(
 			SUBSCRIBER_ID, HandleNewVehicleMessage, token);
 	}
 
-	private Task HandleNewVehicleMessage(NewVehicleMessage message) {
+	private async Task HandleNewVehicleMessage(NewVehicleMessage message) {
 		logger.LogInformation("New Vehicle Message: {message}", message);
-		return Task.CompletedTask;
+		var priceRequest = new PriceRequest {
+			Year = message.Year,
+			Color = message.Color,
+			Make = message.Manufacturer,
+			Model = message.ModelName
+		};
+		var price = await pricer.GetPriceAsync(priceRequest);
+		logger.LogInformation("Got a price: {price} {currency}", price.Price, price.Currency);
 	}
 
 	public Task StopAsync(CancellationToken cancellationToken) {
